@@ -82,5 +82,32 @@ namespace CyberConstructor_RevitAPI_PlayGround
 
         }
 
+        private void button2_Click(object sender, EventArgs e)
+        {
+            FilteredElementCollector col = new FilteredElementCollector(doc);
+            List<Element> elelist = col.OfClass(typeof(TextNoteType)).ToElements().ToList();
+            ElementId eleid = elelist.FirstOrDefault(ele => (ele as TextNoteType)?.Name == "18mm Arial")?.Id;
+
+            TextNoteOptions options = new TextNoteOptions()
+            {
+                HorizontalAlignment = HorizontalTextAlignment.Left,
+                VerticalAlignment = VerticalTextAlignment.Middle,
+                TypeId = eleid
+                
+            };
+                       
+            XYZ point = uidoc.Selection.PickPoint("放置文字點");
+            XYZ point2 = uidoc.Selection.PickPoint("箭頭終點");
+            XYZ point3 = uidoc.Selection.PickPoint("專間轉折");
+            Transaction trans = new Transaction(doc);
+            trans.Start("123");
+            var TN = TextNote.Create(doc, uidoc.ActiveGraphicalView.Id, point, "Cy", options);
+            Leader noteLeader = TN.AddLeader(TextNoteLeaderTypes.TNLT_STRAIGHT_R);
+            noteLeader.End = point2;
+            noteLeader.Elbow = point3;
+            trans.Commit();
+
+
+        }
     }
 }
